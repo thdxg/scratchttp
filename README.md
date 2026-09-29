@@ -6,6 +6,8 @@ HTTP server from scratch in different languages.
 - [ ] rust
 - [ ] zig
 - [ ] oCaml
+- [ ] java
+- [ ] odin
 
 ## Usage
 
