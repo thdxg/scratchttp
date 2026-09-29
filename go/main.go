@@ -87,6 +87,7 @@ func handleConn(conn net.Conn) {
 		res.reasonPhrase = "Bad Request"
 	}
 
+	// TODO: body writing
 	w := bufio.NewWriter(conn)
 	defer w.Flush() // nolint:errcheck
 	_, err := fmt.Fprintf(w, "%s %d %s\r\n", res.httpVersion, res.statusCode, res.reasonPhrase)
@@ -103,6 +104,7 @@ func handleConn(conn net.Conn) {
 	log.Println("request handled")
 }
 
+// TODO: body parsing
 func parseRequest(req *request, line string) error {
 	isStart := len(req.method) == 0
 	if isStart {
