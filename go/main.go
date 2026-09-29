@@ -22,11 +22,15 @@ func main() {
 		log.Fatalln("failed to parse port")
 	}
 
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	addr := fmt.Sprintf(":%d", port)
+
+	listener, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatalln("failed to dial tcp:", err)
 	}
 	defer listener.Close() // nolint:errcheck
+
+	log.Println("server listening on", addr)
 
 	for {
 		conn, err := listener.Accept()
@@ -95,6 +99,8 @@ func handleConn(conn net.Conn) {
 			log.Fatalln("failed to write response header", err)
 		}
 	}
+
+	log.Println("request handled")
 }
 
 func parseRequest(req *request, line string) error {
