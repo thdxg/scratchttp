@@ -2,7 +2,7 @@
 
 HTTP request parsing from scratch in different languages.
 
-- [ ] go
+- [x] go
 - [ ] rust
 - [ ] zig
 - [ ] oCaml
