@@ -6,3 +6,13 @@ HTTP request parsing from scratch in different languages.
 - [ ] rust
 - [ ] zig
 - [ ] oCaml
+
+## Usage
+
+Run the target http server listening on `localhost:$PORT`.
+
+To test, run from project root:
+
+```sh
+mise run test
+```

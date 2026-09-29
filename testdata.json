@@ -2,5 +2,57 @@
   {
     "req": "GET /users HTTP/1.1\r\nHost: example.com\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 49",
     "res": "HTTP/1.1 200 OK\r\nContent-Type: plain/text\r\nLocation: http://example.com/users"
+  },
+  {
+    "req": "GET / HTTP/1.1\r\nHost: example.com",
+    "res": "HTTP/1.1 200 OK\r\nContent-Type: plain/text\r\nLocation: http://example.com/"
+  },
+  {
+    "req": "GET /posts HTTP/1.1\r\nHost: example.com",
+    "res": "HTTP/1.1 200 OK\r\nContent-Type: plain/text\r\nLocation: http://example.com/posts"
+  },
+  {
+    "req": "GET /unknown HTTP/1.1\r\nHost: example.com",
+    "res": "HTTP/1.1 400 Bad Request\r\nContent-Type: plain/text\r\nLocation: http://example.com/unknown"
+  },
+  {
+    "req": "POST /users HTTP/1.1\r\nHost: example.com",
+    "res": "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: plain/text\r\nLocation: http://example.com/users"
+  },
+  {
+    "req": "DELETE /nope HTTP/1.1\r\nHost: example.com",
+    "res": "HTTP/1.1 400 Bad Request\r\nContent-Type: plain/text\r\nLocation: http://example.com/nope"
+  },
+  {
+    "req": "GET /users HTTP/1.1\r\nHost: example.com/",
+    "res": "HTTP/1.1 200 OK\r\nContent-Type: plain/text\r\nLocation: http://example.com/users"
+  },
+  {
+    "req": "GET /users HTTP/1.1\r\nHost: example.com:8080",
+    "res": "HTTP/1.1 200 OK\r\nContent-Type: plain/text\r\nLocation: http://example.com:8080/users"
+  },
+  {
+    "req": "GET /users HTTP/1.1",
+    "res": "HTTP/1.1 200 OK\r\nContent-Type: plain/text\r\nLocation: http:///users"
+  },
+  {
+    "req": "GET /users HTTP/1.1\r\nhost: example.com",
+    "res": "HTTP/1.1 200 OK\r\nContent-Type: plain/text\r\nLocation: http:///users"
+  },
+  {
+    "req": "GET /posts HTTP/1.1\r\nHost: api.example.com\r\nAccept: text/html\r\nUser-Agent: test",
+    "res": "HTTP/1.1 200 OK\r\nContent-Type: plain/text\r\nLocation: http://api.example.com/posts"
+  },
+  {
+    "req": "GET /users",
+    "res": "HTTP/1.1 400 Bad Request\r\nContent-Type: plain/text\r\nLocation: http://"
+  },
+  {
+    "req": "GET /users HTTP/1.1\r\nHost: example.com\r\nBadHeaderNoColon",
+    "res": "HTTP/1.1 400 Bad Request\r\nContent-Type: plain/text\r\nLocation: http://example.com/users"
+  },
+  {
+    "req": "GET /users HTTP/1.1\r\nHost: example.com\r\n\r\n",
+    "res": "HTTP/1.1 400 Bad Request\r\nContent-Type: plain/text\r\nLocation: http://example.com/users"
   }
 ]
