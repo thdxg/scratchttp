@@ -1,0 +1,6 @@
+[
+  {
+    "req": "GET /users HTTP/1.1\r\nHost: example.com\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 49",
+    "res": "HTTP/1.1 200 OK\r\nContent-Type: plain/text\r\nLocation: http://example.com/users"
+  }
+]

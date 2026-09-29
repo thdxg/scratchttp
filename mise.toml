@@ -1,0 +1,8 @@
+[env]
+PORT = "8080"
+
+[tasks.test]
+description = ""
+run = """
+./test.nu
+"""
