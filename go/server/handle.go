@@ -21,6 +21,12 @@ type Request struct {
 	ltype uint8
 }
 
+const (
+	startLine uint8 = iota
+	headerLine
+	bodyLine
+)
+
 type Response struct {
 	HttpVersion  string
 	StatusCode   int
@@ -30,8 +36,8 @@ type Response struct {
 }
 
 type Header struct {
-	name  string
-	value string
+	Name  string
+	Value string
 }
 
 func (srv *Server) handleConn(conn net.Conn) {
@@ -67,15 +73,15 @@ func (srv *Server) handleConn(conn net.Conn) {
 }
 
 func (srv *Server) parseRequest(req *Request, line string) error {
-	if req.ltype == 0 && len(req.Method) != 0 {
-		req.ltype = 1
+	if req.ltype == startLine && len(req.Method) != 0 {
+		req.ltype = headerLine
 	} else if line == "" {
-		req.ltype = 2
+		req.ltype = bodyLine
 		return nil
 	}
 
 	switch req.ltype {
-	case 0: // start line
+	case startLine:
 		parts := strings.SplitN(line, " ", 3)
 		if len(parts) != 3 {
 			return errors.New("invalid start line format")
@@ -83,13 +89,13 @@ func (srv *Server) parseRequest(req *Request, line string) error {
 		req.Method = parts[0]
 		req.URI = parts[1]
 		req.HTTPVersion = parts[2]
-	case 1: // header line
+	case headerLine:
 		parts := strings.SplitN(line, ":", 2)
 		if len(parts) != 2 {
 			return errors.New("invalid header format")
 		}
 		req.Headers = append(req.Headers, Header{parts[0], strings.TrimSpace(parts[1])})
-	case 2: // body
+	case bodyLine:
 		req.Body = line
 	}
 
@@ -138,8 +144,8 @@ func (srv *Server) handleRequest(req *Request) *Response {
 	var loc strings.Builder
 	loc.WriteString("http://")
 	for _, h := range req.Headers {
-		if h.name == "Host" {
-			loc.WriteString(strings.TrimSuffix(h.value, "/"))
+		if h.Name == "Host" {
+			loc.WriteString(strings.TrimSuffix(h.Value, "/"))
 			break
 		}
 	}
@@ -164,7 +170,7 @@ func (srv *Server) writeResponse(conn net.Conn, res *Response) error {
 
 	// headers
 	for _, h := range res.Headers {
-		_, err = fmt.Fprintf(w, "%s: %s\r\n", h.name, h.value)
+		_, err = fmt.Fprintf(w, "%s: %s\r\n", h.Name, h.Value)
 		if err != nil {
 			return err
 		}
