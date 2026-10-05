@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"net"
 
 	"golang.org/x/sync/errgroup"
@@ -44,7 +45,12 @@ func (srv *Server) Run(ctx context.Context) error {
 				return fmt.Errorf("failed to accept connection: %w", err)
 			}
 
-			g.Go(func() error { return srv.handleConn(ctx, conn) })
+			g.Go(func() error {
+				if err := srv.handleConn(ctx, conn); err != nil {
+					log.Println("failed to handle connection: %w", err)
+				}
+				return nil
+			})
 		}
 	})
 
