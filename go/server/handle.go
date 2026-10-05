@@ -2,11 +2,20 @@ package server
 
 import (
 	"bufio"
+	"bytes"
+	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net"
+	"strconv"
 	"strings"
+	"time"
+)
+
+const (
+	maxContentLength = 1 << 10
 )
 
 type Request struct {
@@ -16,19 +25,14 @@ type Request struct {
 	Headers     []Header
 	Body        string
 
-	// ltype is one of 0 for start line, 1 for header line, and 2 for body
-	// used for tracking parse status
-	ltype uint8
+	host          string
+	contentLength uint64
+
+	parseErr error
 }
 
-const (
-	startLine uint8 = iota
-	headerLine
-	bodyLine
-)
-
 type Response struct {
-	HttpVersion  string
+	HTTPVersion  string
 	StatusCode   int
 	ReasonPhrase string
 	Headers      []Header
@@ -40,78 +44,136 @@ type Header struct {
 	Value string
 }
 
-func (srv *Server) handleConn(conn net.Conn) {
+func (srv *Server) handleConn(ctx context.Context, conn net.Conn) error {
 	defer conn.Close() // nolint:errcheck
-	s := bufio.NewScanner(conn)
 
-	req := new(Request)
+	stop := context.AfterFunc(ctx, func() {
+		conn.SetReadDeadline(time.Now()) // nolint:errcheck
+	})
+	defer stop()
 
-	valid := true
-	for s.Scan() {
-		line := s.Text()
-		if err := srv.parseRequest(req, line); err != nil {
-			valid = false
-			break
-		}
-	}
-
-	if err := s.Err(); err != nil {
-		log.Fatalln("failed to read from conn:", err)
+	req, err := readRequest(conn)
+	if err != nil {
+		return fmt.Errorf("failed to read request: %w", err)
 	}
 
 	res := srv.handleRequest(req)
-	if !valid {
-		res.StatusCode = 400
-		res.ReasonPhrase = "Bad Request"
-	}
 
 	if err := srv.writeResponse(conn, res); err != nil {
-		log.Fatalln("failed to write response", err)
+		return fmt.Errorf("failed to write response: %w", err)
 	}
 
 	log.Println(res.StatusCode, req.Method, req.URI)
+
+	return conn.Close()
 }
 
-func (srv *Server) parseRequest(req *Request, line string) error {
-	if req.ltype == startLine && len(req.Method) != 0 {
-		req.ltype = headerLine
-	} else if line == "" {
-		req.ltype = bodyLine
-		return nil
+// readRequest parses a request from the stream.
+// Errors when it fails to read for reasons other than malformed request.
+func readRequest(r io.Reader) (*Request, error) {
+	const (
+		startLine uint8 = iota
+		headerLine
+		bodyLine
+	)
+
+	ltype := startLine
+	req := new(Request)
+	br := bufio.NewReader(r)
+
+loop:
+	for {
+		line, isPrefix, err := br.ReadLine()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				return req, nil
+			}
+			return nil, fmt.Errorf("failed to read line: %w", err)
+		}
+		if isPrefix {
+			req.parseErr = errors.New("line too long")
+			return req, nil
+		}
+
+		switch ltype {
+		case startLine:
+			parts := bytes.SplitN(line, []byte(" "), 3)
+			if len(parts) != 3 {
+				req.parseErr = errors.New("invalid start line format")
+				return req, nil
+			}
+			req.Method = string(parts[0])
+			req.URI = string(parts[1])
+			req.HTTPVersion = string(parts[2])
+			ltype = headerLine
+		case headerLine:
+			if len(line) == 0 {
+				break loop // header end
+			}
+			parts := bytes.SplitN(line, []byte(":"), 2)
+			if len(parts) != 2 {
+				req.parseErr = errors.New("invalid header format")
+				return req, nil
+			}
+			name := string(parts[0])
+			val := string(bytes.TrimSpace(parts[1]))
+			req.Headers = append(req.Headers, Header{name, val})
+			switch strings.ToLower(name) {
+			case "content-length":
+				cl, err := strconv.ParseUint(val, 10, 64)
+				if err != nil {
+					req.parseErr = fmt.Errorf("failed to parse Content-Length: %w", err)
+					return req, nil
+				}
+				req.contentLength = cl
+			case "host":
+				req.host = strings.TrimSuffix(val, "/")
+			}
+		}
 	}
 
-	switch req.ltype {
-	case startLine:
-		parts := strings.SplitN(line, " ", 3)
-		if len(parts) != 3 {
-			return errors.New("invalid start line format")
-		}
-		req.Method = parts[0]
-		req.URI = parts[1]
-		req.HTTPVersion = parts[2]
-	case headerLine:
-		parts := strings.SplitN(line, ":", 2)
-		if len(parts) != 2 {
-			return errors.New("invalid header format")
-		}
-		req.Headers = append(req.Headers, Header{parts[0], strings.TrimSpace(parts[1])})
-	case bodyLine:
-		req.Body = line
+	if req.contentLength > maxContentLength {
+		req.parseErr = errors.New("Content-Length too large")
+		return req, nil
 	}
 
-	return nil
+	body := make([]byte, req.contentLength)
+	_, err := io.ReadFull(br, body)
+	if err != nil {
+		if errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) {
+			req.parseErr = errors.New("body shorter than Content-Length")
+			return req, nil
+		}
+		return nil, fmt.Errorf("failed to read body: %w", err)
+	}
+
+	req.Body = string(body)
+
+	return req, nil
 }
 
 func (srv *Server) handleRequest(req *Request) *Response {
 	res := new(Response)
+	res.HTTPVersion = "HTTP/1.1"
 
-	res.HttpVersion = "HTTP/1.1"
+	// always include these headers
+	defer func() {
+		res.Headers = append(res.Headers,
+			Header{"Content-Type", "text/plain"},
+			Header{"Location", fmt.Sprintf("http://%s%s", req.host, req.URI)},
+			Header{"Content-Length", strconv.Itoa(len(res.Body))},
+		)
+	}()
 
-	// validate start line
+	if req.parseErr != nil {
+		res.StatusCode = 400
+		res.ReasonPhrase = "Bad Request"
+		return res
+	}
+
 	res.StatusCode = 200
 	res.ReasonPhrase = "OK"
 
-	// validate uri
 	switch req.URI {
 	case "/":
 		res.Body = "hi"
@@ -135,25 +197,9 @@ func (srv *Server) handleRequest(req *Request) *Response {
 			res.ReasonPhrase = "Method Not Allowed"
 		}
 	default:
-		res.Body = ""
-		res.StatusCode = 400
-		res.ReasonPhrase = "Bad Request"
+		res.StatusCode = 404
+		res.ReasonPhrase = "Not Found"
 	}
-
-	// create location
-	var loc strings.Builder
-	loc.WriteString("http://")
-	for _, h := range req.Headers {
-		if h.Name == "Host" {
-			loc.WriteString(strings.TrimSuffix(h.Value, "/"))
-			break
-		}
-	}
-	loc.WriteString(req.URI)
-
-	// req.headers
-	res.Headers = append(res.Headers, Header{"Content-Type", "plain/text"})
-	res.Headers = append(res.Headers, Header{"Location", loc.String()})
 
 	return res
 }
@@ -163,7 +209,7 @@ func (srv *Server) writeResponse(conn net.Conn, res *Response) error {
 	defer w.Flush() // nolint:errcheck
 
 	// start line
-	_, err := fmt.Fprintf(w, "%s %d %s\r\n", res.HttpVersion, res.StatusCode, res.ReasonPhrase)
+	_, err := fmt.Fprintf(w, "%s %d %s\r\n", res.HTTPVersion, res.StatusCode, res.ReasonPhrase)
 	if err != nil {
 		return err
 	}

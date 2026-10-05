@@ -1,9 +1,12 @@
 package server
 
 import (
+	"context"
+	"errors"
 	"fmt"
-	"log"
 	"net"
+
+	"golang.org/x/sync/errgroup"
 )
 
 type Server struct {
@@ -18,19 +21,32 @@ func New(addr string) *Server {
 	}
 }
 
-func (srv *Server) Run() error {
+func (srv *Server) Run(ctx context.Context) error {
 	listener, err := net.Listen("tcp", srv.addr)
 	if err != nil {
 		return fmt.Errorf("failed to dial tcp: %w", err)
 	}
-	defer listener.Close() // nolint:errcheck
 
-	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			log.Fatalln("failed to accept connection:", err)
+	g, ctx := errgroup.WithContext(ctx)
+
+	g.Go(func() error {
+		<-ctx.Done()
+		return listener.Close()
+	})
+
+	g.Go(func() error {
+		for {
+			conn, err := listener.Accept()
+			if err != nil {
+				if errors.Is(err, net.ErrClosed) {
+					return nil // normal shutdown
+				}
+				return fmt.Errorf("failed to accept connection: %w", err)
+			}
+
+			g.Go(func() error { return srv.handleConn(ctx, conn) })
 		}
+	})
 
-		go srv.handleConn(conn)
-	}
+	return g.Wait()
 }
