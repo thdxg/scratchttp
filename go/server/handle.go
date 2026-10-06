@@ -99,7 +99,7 @@ loop:
 		case startLine:
 			parts := bytes.SplitN(line, []byte(" "), 3)
 			if len(parts) != 3 {
-				req.parseErr = errors.New("invalid start line format")
+				req.parseErr = errors.New("malformed start line")
 				return req, nil
 			}
 			req.Method = string(parts[0])
@@ -112,7 +112,7 @@ loop:
 			}
 			parts := bytes.SplitN(line, []byte(":"), 2)
 			if len(parts) != 2 {
-				req.parseErr = errors.New("invalid header format")
+				req.parseErr = errors.New("malformed header")
 				return req, nil
 			}
 			name := string(parts[0])
