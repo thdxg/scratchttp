@@ -2,6 +2,7 @@ package server
 
 import (
 	"slices"
+	"strings"
 	"sync"
 )
 
@@ -14,11 +15,12 @@ func (db *DB) Add(s string) {
 	db.mu.Lock()
 	defer db.mu.Unlock()
 	db.data = append(db.data, s)
-	slices.Sort(db.data)
+	i, _ := slices.BinarySearch(db.data, s)
+	db.data = slices.Insert(db.data, i, s)
 }
 
-func (db *DB) Get() []string {
+func (db *DB) Get() string {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
-	return db.data
+	return strings.Join(db.data, "\n")
 }
