@@ -26,14 +26,9 @@ func Test_main(t *testing.T) {
 		t.Fatal("TESTDATA not set")
 	}
 
-	sport, ok := os.LookupEnv("PORT")
+	addr, ok := os.LookupEnv("ADDRESS")
 	if !ok {
-		t.Fatal("PORT not set")
-	}
-
-	port, err := strconv.ParseUint(sport, 10, 16)
-	if err != nil {
-		t.Fatalf("failed to parse port: %v", err)
+		t.Fatal("ADDRESS not set")
 	}
 
 	data, err := os.ReadFile(path)
@@ -46,8 +41,6 @@ func Test_main(t *testing.T) {
 	if err := json.Unmarshal(data, &phases); err != nil {
 		t.Fatalf("failed to unmarshal testdata: %v", err)
 	}
-
-	addr := fmt.Sprintf("localhost:%d", port)
 
 	go main()
 	waitForServer(t, addr)
