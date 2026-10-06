@@ -14,7 +14,6 @@ type DB struct {
 func (db *DB) Add(s string) {
 	db.mu.Lock()
 	defer db.mu.Unlock()
-	db.data = append(db.data, s)
 	i, _ := slices.BinarySearch(db.data, s)
 	db.data = slices.Insert(db.data, i, s)
 }
