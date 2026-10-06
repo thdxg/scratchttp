@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	maxContentLength = 1 << 10
+	maxContentLength uint64 = 1 << 10
 )
 
 type Request struct {
