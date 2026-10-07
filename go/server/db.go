@@ -20,5 +20,6 @@ func (db *DB) Add(s string) {
 func (db *DB) Get() []string {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
-	return slices.Clone(db.data)
+	clone := slices.Clone(db.data)
+	return clone
 }

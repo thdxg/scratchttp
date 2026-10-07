@@ -39,15 +39,22 @@ func Test_main(t *testing.T) {
 	c := http.DefaultClient
 	url := fmt.Sprintf("http://%s%s", addr, "/store")
 
-	for i, d := range data {
-		t.Run(fmt.Sprintf("request %d: %s", i, d), func(t *testing.T) {
-			t.Parallel()
-			_, err := c.Post(url, "text/plain", strings.NewReader(d))
-			if err != nil {
-				t.Fatalf("request failed: %v", err)
-			}
-		})
-	}
+	t.Run("post", func(t *testing.T) {
+		for i, d := range data {
+			t.Run(fmt.Sprintf("request %d", i), func(t *testing.T) {
+				t.Parallel()
+				res, err := c.Post(url, "text/plain", strings.NewReader(d))
+				if err != nil {
+					t.Fatalf("request failed: %v", err)
+				}
+				defer res.Body.Close() // nolint:errcheck
+
+				if res.StatusCode != 200 {
+					t.Fatalf("unexpected status: %d", res.StatusCode)
+				}
+			})
+		}
+	})
 
 	res, err := c.Get(url)
 	if err != nil {
