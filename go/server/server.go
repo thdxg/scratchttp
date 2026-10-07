@@ -98,7 +98,6 @@ func (srv *Server) handleRequest(req *http.Request) *http.Response {
 	defer func() {
 		res.HTTPVersion = "HTTP/1.1"
 		res.Headers = append(res.Headers,
-			http.Header{Name: "Content-Type", Value: "text/plain"},
 			http.Header{Name: "Location", Value: fmt.Sprintf("http://%s%s", req.Host, req.URI)},
 			http.Header{Name: "Content-Length", Value: strconv.Itoa(len(res.Body))},
 		)

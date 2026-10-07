@@ -2,7 +2,6 @@ package server
 
 import (
 	"slices"
-	"strings"
 	"sync"
 )
 
@@ -18,8 +17,8 @@ func (db *DB) Add(s string) {
 	db.data = slices.Insert(db.data, i, s)
 }
 
-func (db *DB) Get() string {
+func (db *DB) Get() []string {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
-	return strings.Join(db.data, "\n")
+	return slices.Clone(db.data)
 }

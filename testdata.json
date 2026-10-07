@@ -1,90 +1,114 @@
 [
-  {
-    "req": "GET / HTTP/1.1\r\nHost: example.com",
-    "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/\r\nContent-Length: 2\r\n\r\nhi"
-  },
-  {
-    "req": "GET / HTTP/1.1\r\nHost: example.com\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 49",
-    "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/\r\nContent-Length: 2\r\n\r\nhi"
-  },
-  {
-    "req": "GET / HTTP/1.1\r\nHost: api.example.com\r\nAccept: text/html\r\nUser-Agent: test",
-    "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://api.example.com/\r\nContent-Length: 2\r\n\r\nhi"
-  },
-  {
-    "req": "GET / HTTP/1.1\r\nHost: example.com/",
-    "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/\r\nContent-Length: 2\r\n\r\nhi"
-  },
-  {
-    "req": "GET / HTTP/1.1\r\nHost: example.com:8080",
-    "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com:8080/\r\nContent-Length: 2\r\n\r\nhi"
-  },
-  {
-    "req": "GET / HTTP/1.1",
-    "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http:///\r\nContent-Length: 2\r\n\r\nhi"
-  },
-  {
-    "req": "GET / HTTP/1.1\r\nhost: example.com",
-    "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/\r\nContent-Length: 2\r\n\r\nhi"
-  },
-  {
-    "req": "GET / HTTP/1.1\r\nHost: example.com\r\n\r\n",
-    "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/\r\nContent-Length: 2\r\n\r\nhi"
-  },
-  {
-    "req": "GET /unknown HTTP/1.1\r\nHost: example.com",
-    "res": "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nLocation: http://example.com/unknown\r\nContent-Length: 0\r\n\r\n"
-  },
-  {
-    "req": "DELETE /nope HTTP/1.1\r\nHost: example.com",
-    "res": "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nLocation: http://example.com/nope\r\nContent-Length: 0\r\n\r\n"
-  },
-  {
-    "req": "GET /",
-    "res": "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain\r\nLocation: http://\r\nContent-Length: 0\r\n\r\n"
-  },
-  {
-    "req": "GET / HTTP/1.1\r\nHost: example.com\r\nBadHeaderNoColon",
-    "res": "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain\r\nLocation: http://example.com/\r\nContent-Length: 0\r\n\r\n"
-  },
-  {
-    "req": "POST /echo HTTP/1.1\r\nHost: example.com\r\nContent-Length: 5\r\n\r\nhello",
-    "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/echo\r\nContent-Length: 5\r\n\r\nhello"
-  },
-  {
-    "req": "POST /echo HTTP/1.1\r\nHost: example.com\r\nContent-Type: text/plain\r\nContent-Length: 11\r\n\r\nhello world",
-    "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/echo\r\nContent-Length: 11\r\n\r\nhello world"
-  },
-  {
-    "req": "POST /echo HTTP/1.1\r\nHost: example.com\r\nContent-Length: 10\r\n\r\nhello",
-    "res": "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain\r\nLocation: http://example.com/echo\r\nContent-Length: 0\r\n\r\n"
-  },
-  {
-    "req": "POST /echo HTTP/1.1\r\nHost: example.com",
-    "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/echo\r\nContent-Length: 0\r\n\r\n"
-  },
-  {
-    "req": "GET /echo HTTP/1.1\r\nHost: example.com",
-    "res": "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/plain\r\nLocation: http://example.com/echo\r\nContent-Length: 0\r\n\r\n"
-  },
-  {
-    "req": "GET /store HTTP/1.1\r\nHost: example.com",
-    "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/store\r\nContent-Length: 0\r\n\r\n"
-  },
-  {
-    "req": "POST /store HTTP/1.1\r\nHost: example.com\r\nContent-Length: 5\r\n\r\nfirst",
-    "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/store\r\nContent-Length: 5\r\n\r\nfirst"
-  },
-  {
-    "req": "POST /store HTTP/1.1\r\nHost: example.com\r\nContent-Length: 6\r\n\r\nsecond",
-    "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/store\r\nContent-Length: 12\r\n\r\nfirst\nsecond"
-  },
-  {
-    "req": "GET /store HTTP/1.1\r\nHost: example.com",
-    "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/store\r\nContent-Length: 12\r\n\r\nfirst\nsecond"
-  },
-  {
-    "req": "DELETE /store HTTP/1.1\r\nHost: example.com",
-    "res": "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/plain\r\nLocation: http://example.com/store\r\nContent-Length: 0\r\n\r\n"
-  }
+  [
+    {
+      "req": "GET / HTTP/1.1\r\nHost: example.com",
+      "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/\r\nContent-Length: 2\r\n\r\nhi"
+    },
+    {
+      "req": "GET / HTTP/1.1\r\nHost: example.com\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 49",
+      "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/\r\nContent-Length: 2\r\n\r\nhi"
+    },
+    {
+      "req": "GET / HTTP/1.1\r\nHost: api.example.com\r\nAccept: text/html\r\nUser-Agent: test",
+      "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://api.example.com/\r\nContent-Length: 2\r\n\r\nhi"
+    },
+    {
+      "req": "GET / HTTP/1.1\r\nHost: example.com/",
+      "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/\r\nContent-Length: 2\r\n\r\nhi"
+    },
+    {
+      "req": "GET / HTTP/1.1\r\nHost: example.com:8080",
+      "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com:8080/\r\nContent-Length: 2\r\n\r\nhi"
+    },
+    {
+      "req": "GET / HTTP/1.1",
+      "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http:///\r\nContent-Length: 2\r\n\r\nhi"
+    },
+    {
+      "req": "GET / HTTP/1.1\r\nhost: example.com",
+      "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/\r\nContent-Length: 2\r\n\r\nhi"
+    },
+    {
+      "req": "GET / HTTP/1.1\r\nHost: example.com\r\n\r\n",
+      "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/\r\nContent-Length: 2\r\n\r\nhi"
+    },
+    {
+      "req": "GET /unknown HTTP/1.1\r\nHost: example.com",
+      "res": "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nLocation: http://example.com/unknown\r\nContent-Length: 0\r\n\r\n"
+    },
+    {
+      "req": "DELETE /nope HTTP/1.1\r\nHost: example.com",
+      "res": "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nLocation: http://example.com/nope\r\nContent-Length: 0\r\n\r\n"
+    },
+    {
+      "req": "GET /",
+      "res": "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain\r\nLocation: http://\r\nContent-Length: 0\r\n\r\n"
+    },
+    {
+      "req": "GET / HTTP/1.1\r\nHost: example.com\r\nBadHeaderNoColon",
+      "res": "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain\r\nLocation: http://example.com/\r\nContent-Length: 0\r\n\r\n"
+    },
+    {
+      "req": "POST /echo HTTP/1.1\r\nHost: example.com\r\nContent-Length: 5\r\n\r\nhello",
+      "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/echo\r\nContent-Length: 5\r\n\r\nhello"
+    },
+    {
+      "req": "POST /echo HTTP/1.1\r\nHost: example.com\r\nContent-Type: text/plain\r\nContent-Length: 11\r\n\r\nhello world",
+      "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/echo\r\nContent-Length: 11\r\n\r\nhello world"
+    },
+    {
+      "req": "POST /echo HTTP/1.1\r\nHost: example.com\r\nContent-Length: 10\r\n\r\nhello",
+      "res": "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain\r\nLocation: http://example.com/echo\r\nContent-Length: 0\r\n\r\n"
+    },
+    {
+      "req": "POST /echo HTTP/1.1\r\nHost: example.com",
+      "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/echo\r\nContent-Length: 0\r\n\r\n"
+    },
+    {
+      "req": "GET /echo HTTP/1.1\r\nHost: example.com",
+      "res": "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/plain\r\nLocation: http://example.com/echo\r\nContent-Length: 0\r\n\r\n"
+    },
+    {
+      "req": "GET /store HTTP/1.1\r\nHost: example.com",
+      "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/store\r\nContent-Length: 0\r\n\r\n"
+    },
+    {
+      "req": "DELETE /store HTTP/1.1\r\nHost: example.com",
+      "res": "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/plain\r\nLocation: http://example.com/store\r\nContent-Length: 0\r\n\r\n"
+    }
+  ],
+  [
+    {
+      "req": "POST /store HTTP/1.1\r\nHost: example.com\r\nContent-Length: 6\r\n\r\nbanana",
+      "status": "HTTP/1.1 200 OK"
+    },
+    {
+      "req": "POST /store HTTP/1.1\r\nHost: example.com\r\nContent-Length: 5\r\n\r\napple",
+      "status": "HTTP/1.1 200 OK"
+    },
+    {
+      "req": "POST /store HTTP/1.1\r\nHost: example.com\r\nContent-Length: 6\r\n\r\ncherry",
+      "status": "HTTP/1.1 200 OK"
+    }
+  ],
+  [
+    {
+      "req": "GET /store HTTP/1.1\r\nHost: example.com",
+      "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/store\r\nContent-Length: 19\r\n\r\napple\nbanana\ncherry"
+    },
+    {
+      "req": "GET /store HTTP/1.1\r\nHost: example.com",
+      "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/store\r\nContent-Length: 19\r\n\r\napple\nbanana\ncherry"
+    },
+    {
+      "req": "GET /store HTTP/1.1\r\nHost: example.com",
+      "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/store\r\nContent-Length: 19\r\n\r\napple\nbanana\ncherry"
+    }
+  ],
+  [
+    {
+      "req": "POST /store HTTP/1.1\r\nHost: example.com\r\nContent-Length: 8\r\n\r\naardvark",
+      "res": "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nLocation: http://example.com/store\r\nContent-Length: 28\r\n\r\naardvark\napple\nbanana\ncherry"
+    }
+  ]
 ]

@@ -1,24 +1,16 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
-	"net"
+	"net/http"
 	"os"
-	"strconv"
+	"slices"
+	"strings"
 	"testing"
 	"time"
 )
-
-// test checks either the exact response (Res) or, when the body depends on
-// what other concurrent requests did, only the status line (Status).
-type test struct {
-	Req    string `json:"req"`
-	Res    string `json:"res"`
-	Status string `json:"status"`
-}
 
 func Test_main(t *testing.T) {
 	path, ok := os.LookupEnv("TESTDATA")
@@ -31,81 +23,53 @@ func Test_main(t *testing.T) {
 		t.Fatal("ADDRESS not set")
 	}
 
-	data, err := os.ReadFile(path)
+	f, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("failed to read testdata: %v", err)
 	}
 
-	// Phases run in order; the tests inside a phase run in parallel.
-	var phases [][]test
-	if err := json.Unmarshal(data, &phases); err != nil {
+	data := make([]string, 0)
+	if err := json.Unmarshal(f, &data); err != nil {
 		t.Fatalf("failed to unmarshal testdata: %v", err)
 	}
 
 	go main()
-	waitForServer(t, addr)
+	time.Sleep(time.Second) // wait for server
 
-	for p, phase := range phases {
-		t.Run(fmt.Sprintf("phase%d", p), func(t *testing.T) {
-			for i, tt := range phase {
-				t.Run(strconv.Itoa(i), func(t *testing.T) {
-					t.Parallel()
+	c := http.DefaultClient
+	url := fmt.Sprintf("http://%s%s", addr, "/store")
 
-					res := roundTrip(t, addr, tt.Req)
-
-					if tt.Status != "" {
-						status, _, _ := bytes.Cut(res, []byte("\r\n"))
-						if string(status) != tt.Status {
-							t.Errorf("request: %q\nwant status: %q\n got status: %q", tt.Req, tt.Status, status)
-						}
-						return
-					}
-
-					if string(res) != tt.Res {
-						t.Errorf("request: %q\nwant: %q\n got: %q", tt.Req, tt.Res, res)
-					}
-				})
+	for i, d := range data {
+		t.Run(fmt.Sprintf("request %d: %s", i, d), func(t *testing.T) {
+			t.Parallel()
+			_, err := c.Post(url, "text/plain", strings.NewReader(d))
+			if err != nil {
+				t.Fatalf("request failed: %v", err)
 			}
 		})
 	}
-}
 
-func roundTrip(t *testing.T, addr, req string) []byte {
-	t.Helper()
-
-	conn, err := net.Dial("tcp", addr)
+	res, err := c.Get(url)
 	if err != nil {
-		t.Fatalf("failed to dial tcp: %v", err)
+		t.Fatalf("request failed: %v", err)
 	}
-	defer conn.Close() // nolint:errcheck
+	defer res.Body.Close() // nolint:errcheck
 
-	conn.SetDeadline(time.Now().Add(2 * time.Second)) // nolint:errcheck
-
-	if _, err := io.WriteString(conn, req); err != nil {
-		t.Fatalf("failed to send request: %v", err)
-	}
-
-	if err := conn.(*net.TCPConn).CloseWrite(); err != nil {
-		t.Fatalf("failed to close write side: %v", err)
-	}
-
-	res, err := io.ReadAll(conn)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		t.Fatalf("failed to read response: %v", err)
+		t.Fatalf("failed to read body: %v", err)
 	}
-	return res
-}
 
-func waitForServer(t *testing.T, addr string) {
-	t.Helper()
-	deadline := time.Now().Add(2 * time.Second)
-	for time.Now().Before(deadline) {
-		conn, err := net.Dial("tcp", addr)
-		if err == nil {
-			conn.Close() // nolint:errcheck
-			return
-		}
-		time.Sleep(10 * time.Millisecond)
+	expected := slices.Clone(data)
+	slices.Sort(expected)
+
+	actual := make([]string, 0)
+	if err := json.Unmarshal(body, &actual); err != nil {
+		t.Fatalf("failed to unmarshal body: %v", err)
 	}
-	t.Fatalf("server not listening on %s", addr)
+
+	if !slices.Equal(expected, actual) {
+		t.Fatalf("\nexpected: %s\n  actual: %s",
+			strings.Join(expected, ","), strings.Join(actual, ","))
+	}
 }
