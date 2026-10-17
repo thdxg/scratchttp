@@ -14,8 +14,17 @@ const (
 	maxRequestContentLength uint64 = 1 << 10
 )
 
+type Method string
+
+const (
+	MethodGet    Method = "GET"
+	MethodPost   Method = "POST"
+	MethodPut    Method = "PUT"
+	MethodDelete Method = "DELETE"
+)
+
 type Request struct {
-	Method      string
+	Method      Method
 	URI         string
 	HTTPVersion string
 	Headers     []Header
@@ -61,9 +70,15 @@ loop:
 				req.ParseErr = errors.New("malformed start line")
 				return req, nil
 			}
-			req.Method = string(parts[0])
 			req.URI = string(parts[1])
 			req.HTTPVersion = string(parts[2])
+			switch Method(parts[0]) {
+			case MethodGet, MethodPost, MethodPut, MethodDelete:
+				req.Method = Method(parts[0])
+			default:
+				req.ParseErr = errors.New("malformed start line")
+				return req, nil
+			}
 			ltype = headerLine
 		case headerLine:
 			if len(line) == 0 {
