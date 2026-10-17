@@ -82,7 +82,8 @@ loop:
 			ltype = headerLine
 		case headerLine:
 			if len(line) == 0 {
-				break loop // header end
+				ltype = bodyLine // nolint:ineffassign
+				break loop       // header end
 			}
 			parts := bytes.SplitN(line, []byte(":"), 2)
 			if len(parts) != 2 {

@@ -5,8 +5,6 @@ import (
 	"scratchttp/http"
 )
 
-type Handler func(req *http.Request) (res *http.Response)
-
 func (srv *Server) HandleIndex(req *http.Request) *http.Response {
 	res := new(http.Response)
 

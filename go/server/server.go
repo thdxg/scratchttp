@@ -19,6 +19,8 @@ type Server struct {
 	routes map[string]Handler
 }
 
+type Handler func(req *http.Request) (res *http.Response)
+
 func New(addr string) *Server {
 	srv := new(Server)
 
