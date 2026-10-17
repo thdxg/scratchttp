@@ -13,12 +13,12 @@ HTTP server from scratch in different languages.
 
 | Method | Path     | Response                                                                       |
 | ------ | -------- | ------------------------------------------------------------------------------ |
-| any    | `/`      | `200 OK` with body `hi`                                                        |
+| `GET`  | `/`      | `200 OK` with body `hi`                                                        |
 | `POST` | `/echo`  | `200 OK` with the request body as the response body                            |
 | `GET`  | `/store` | `200 OK` with every stored value, joined by `\n`                               |
 | `POST` | `/store` | Stores the request body, then `200 OK` with every stored value, joined by `\n` |
 
-Other methods on `/echo` or `/store` return `405 Method Not Allowed`. Other paths return `404 Not Found`.
+Other methods return `405 Method Not Allowed`. Other paths return `404 Not Found`.
 
 **Requests.** Headers end at a blank line or end of input. The body is exactly `Content-Length` bytes (empty if absent). Header names are case-insensitive.
 
@@ -33,6 +33,7 @@ Other methods on `/echo` or `/store` return `405 Method Not Allowed`. Other path
 `<Host>` is the `Host` value without a trailing `/`, or empty. Error responses (400, 404, 405) have empty bodies. The connection closes after each response, and `/store` values live in memory while the server runs.
 
 See [testdata.json](testdata.json) for exact requests and responses.
+
 ## Usage
 
 Run the target http server listening on `localhost:$PORT`.
