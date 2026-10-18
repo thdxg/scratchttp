@@ -21,9 +21,9 @@ go = "1.27.2"
 rust = { version = "1.99.1", profile = "minimal", components = "rustfmt,clippy,rust-analyzer,rust-src" }
 
 [tasks."test:go"]
-dir = "./go"
+dir = "{{ config_root }}/go"
 run = "go test"
 
 [tasks."test:rust"]
-dir = "./rust"
+dir = "{{ config_root }}/rust"
 run = "cargo test"
