@@ -12,3 +12,13 @@ fn main() -> Result<()> {
 
     srv.run()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn test_main() {
+        let path = env::var("TESTDATA").context("TESTDATA not set").unwrap();
+
+    }
+}
