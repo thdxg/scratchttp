@@ -17,7 +17,9 @@ impl DB {
             .data
             .write()
             .map_err(|e| anyhow!("lock poisoned: {e}"))?;
-        data.push(s);
+        let (Ok(idx) | Err(idx)) = data.binary_search(&s);
+        data.insert(idx, s);
+
         Ok(())
     }
 
