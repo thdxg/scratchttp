@@ -16,9 +16,11 @@ go = "1.27.2"
 "go:golang.org/x/tools/cmd/goimports" = "0.52.0"
 "aqua:golangci/golangci-lint" = "2.15.0"
 "aqua:nametake/golangci-lint-langserver" = "0.0.12"
-
 # rust
 rust = { version = "1.99.1", profile = "minimal", components = "rustfmt,clippy,rust-analyzer,rust-src" }
+#zig
+zig = "0.17.0"
+zls = "0.16.0"
 
 [tasks."test:go"]
 dir = "{{ config_root }}/go"

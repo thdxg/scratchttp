@@ -140,3 +140,80 @@ specifiers = ["1.99.1"]
 [tools.rust.options]
 components = "clippy,rust-analyzer,rust-src,rustfmt"
 profile = "minimal"
+
+[[tools.zig]]
+version = "0.17.0"
+backend = "core:zig"
+specifiers = [
+    "0.17",
+    "0.17.0",
+]
+
+[tools.zig."platforms.linux-arm64"]
+checksum = "sha256:9e8d11661d4ae3bd57702a3832781e23ad151dde5798e16a5ccd503f65234ff8"
+url = "https://ziglang.org/download/0.17.0/zig-aarch64-linux-0.17.0.tar.xz"
+
+[tools.zig."platforms.linux-arm64-musl"]
+checksum = "sha256:9e8d11661d4ae3bd57702a3832781e23ad151dde5798e16a5ccd503f65234ff8"
+url = "https://ziglang.org/download/0.17.0/zig-aarch64-linux-0.17.0.tar.xz"
+
+[tools.zig."platforms.linux-x64"]
+checksum = "sha256:1cbe9df9f27e6b78d14ccbca43b6703a404ef79ef1c463de901d7f088d4e2026"
+url = "https://ziglang.org/download/0.17.0/zig-x86_64-linux-0.17.0.tar.xz"
+
+[tools.zig."platforms.linux-x64-musl"]
+checksum = "sha256:1cbe9df9f27e6b78d14ccbca43b6703a404ef79ef1c463de901d7f088d4e2026"
+url = "https://ziglang.org/download/0.17.0/zig-x86_64-linux-0.17.0.tar.xz"
+
+[tools.zig."platforms.macos-arm64"]
+checksum = "sha256:b607e9b9234790a008116ae5bdb71c6243b84b9fb42a53a9e70fde41c06c536a"
+url = "https://ziglang.org/download/0.17.0/zig-aarch64-macos-0.17.0.tar.xz"
+provenance = "minisign"
+
+[tools.zig."platforms.macos-x64"]
+checksum = "sha256:4f9a1c5269aa17ebda5e6d3c2b89d6cbf36f7d2b22a0306e9ab98f25f95529c6"
+url = "https://ziglang.org/download/0.17.0/zig-x86_64-macos-0.17.0.tar.xz"
+
+[tools.zig."platforms.windows-x64"]
+checksum = "sha256:b5663f69581dcf391293fbf16c06cb80d81d806545ce618b4d0bab7f0eb8c428"
+url = "https://ziglang.org/download/0.17.0/zig-x86_64-windows-0.17.0.zip"
+
+[[tools.zls]]
+version = "0.16.0"
+backend = "aqua:zigtools/zls"
+specifiers = ["0.16.0"]
+
+[tools.zls."platforms.linux-arm64"]
+checksum = "sha256:430cd293d201eb70ae2519dbc96c854bf8791b8df7fc9392e8d2dc9680a2bed7"
+url = "https://builds.zigtools.org/zls-aarch64-linux-0.16.0.tar.xz"
+provenance = "minisign"
+
+[tools.zls."platforms.linux-arm64-musl"]
+checksum = "sha256:430cd293d201eb70ae2519dbc96c854bf8791b8df7fc9392e8d2dc9680a2bed7"
+url = "https://builds.zigtools.org/zls-aarch64-linux-0.16.0.tar.xz"
+provenance = "minisign"
+
+[tools.zls."platforms.linux-x64"]
+checksum = "sha256:ded6d562a0b86ee878b1ddf70ffab2797ce3cdca3b02d6077548f9d56dff96b6"
+url = "https://builds.zigtools.org/zls-x86_64-linux-0.16.0.tar.xz"
+provenance = "minisign"
+
+[tools.zls."platforms.linux-x64-musl"]
+checksum = "sha256:ded6d562a0b86ee878b1ddf70ffab2797ce3cdca3b02d6077548f9d56dff96b6"
+url = "https://builds.zigtools.org/zls-x86_64-linux-0.16.0.tar.xz"
+provenance = "minisign"
+
+[tools.zls."platforms.macos-arm64"]
+checksum = "blake3:2312236530ecbadf6e5c22e40729e2ab805a20fd4b3a922899a617f5e5dd5ba9"
+url = "https://builds.zigtools.org/zls-aarch64-macos-0.16.0.tar.xz"
+provenance = "minisign"
+
+[tools.zls."platforms.macos-x64"]
+checksum = "sha256:49f716ea96c1aadaecaa5d9c0a50874cbcf443dc42b825f1e7ee35499ad3eb96"
+url = "https://builds.zigtools.org/zls-x86_64-macos-0.16.0.tar.xz"
+provenance = "minisign"
+
+[tools.zls."platforms.windows-x64"]
+checksum = "sha256:35cbb7163224e8cf92d21099c1b1391f2aba927f25d389f021b13a21d40b96dd"
+url = "https://builds.zigtools.org/zls-x86_64-windows-0.16.0.zip"
+provenance = "minisign"
