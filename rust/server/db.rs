@@ -1,4 +1,4 @@
-use anyhow::{Result, bail};
+use anyhow::{Result, anyhow};
 use std::sync::{Arc, RwLock};
 
 pub struct DB {
@@ -13,17 +13,19 @@ impl DB {
     }
 
     pub fn add(&self, s: String) -> Result<()> {
-        let Ok(mut data) = self.data.write() else {
-            bail!("failed to acquire lock")
-        };
+        let mut data = self
+            .data
+            .write()
+            .map_err(|e| anyhow!("lock poisoned: {e}"))?;
         data.push(s);
         Ok(())
     }
 
     pub fn get(&self) -> Result<Vec<String>> {
-        let Ok(data) = self.data.read() else {
-            bail!("failed to acquire lock")
-        };
+        let data = self
+            .data
+            .read()
+            .map_err(|e| anyhow!("lock poisoned: {e}"))?;
 
         Ok(data.to_vec())
     }
