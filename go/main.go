@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"os"
 	"os/signal"
 	"scratchttp/server"
@@ -16,12 +16,14 @@ func main() {
 
 	addr, ok := os.LookupEnv("ADDRESS")
 	if !ok {
-		log.Fatalln("ADDRESS not set")
+		fmt.Fprintln(os.Stderr, "ADDRESS not set")
+		os.Exit(1)
 	}
 
 	srv := server.New(addr)
 
 	if err := srv.Run(ctx); err != nil {
-		log.Fatalln("failed to run server:", err)
+		fmt.Fprintln(os.Stderr, "failed to run server:", err)
+		os.Exit(1)
 	}
 }

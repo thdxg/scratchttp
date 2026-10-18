@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net"
 	"scratchttp/http"
 	"strconv"
@@ -60,7 +59,7 @@ func (srv *Server) Run(ctx context.Context) error {
 
 			g.Go(func() error {
 				if err := srv.handleConn(ctx, conn); err != nil {
-					log.Println("failed to handle connection:", err)
+					fmt.Println("failed to handle connection:", err)
 				}
 				return nil
 			})
@@ -89,7 +88,7 @@ func (srv *Server) handleConn(ctx context.Context, conn net.Conn) error {
 		return fmt.Errorf("failed to write response: %w", err)
 	}
 
-	log.Println(res.StatusCode, req.Method, req.URI)
+	fmt.Println(res.StatusCode, req.Method, req.URI)
 
 	return conn.Close()
 }
