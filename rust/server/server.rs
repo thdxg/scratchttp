@@ -4,12 +4,13 @@ use std::{
     net::TcpListener,
     thread::{self},
 };
-
 use crate::http::{self, Header};
+use super::db::DB;
 
 pub struct Server {
-    addr: String,
-    routes: HashMap<&'static str, Handler>,
+    pub addr: String,
+    pub db: DB,
+    pub routes: HashMap<&'static str, Handler>,
 }
 
 type Handler = fn(&Server, &http::Request) -> http::Response;
@@ -20,8 +21,10 @@ impl Server {
         let routes = HashMap::from([
             ("/", Self::handle_index as Handler),
             ("/echo", Self::handle_echo as Handler),
+            ("/store", Self::handle_store as Handler),
         ]);
-        Server { addr, routes }
+        let db = DB::new();
+        Server { addr, routes, db }
     }
 
     pub fn run(&self) -> Result<()> {
