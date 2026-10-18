@@ -31,17 +31,3 @@ Other methods return `405 Method Not Allowed`. Other paths return `404 Not Found
     Content-Length: <body length>
 
 `<Host>` is the `Host` value without a trailing `/`, or empty. Error responses (400, 404, 405) have empty bodies. The connection closes after each response, and `/store` values live in memory while the server runs.
-
-See [testdata.json](testdata.json) for exact requests and responses.
-
-## Usage
-
-Run the target http server listening on `localhost:$PORT`.
-
-To test, run from project root:
-
-```sh
-mise run test
-```
-
-The `/store` tests expect an empty store, so restart the server before each run.
