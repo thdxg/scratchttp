@@ -48,6 +48,9 @@ mod tests {
             }
         });
 
+        let mut data = data;
+        data.sort();
+
         let res = c.get(url).send().context("request failed")?;
         assert_eq!(
             res.json::<Vec<String>>()

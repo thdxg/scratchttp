@@ -3,7 +3,7 @@
 HTTP server from scratch in different languages.
 
 - [x] go
-- [ ] rust
+- [x] rust
 - [ ] zig
 - [ ] oCaml
 - [ ] java
