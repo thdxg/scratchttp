@@ -5,9 +5,6 @@ lockfile = true
 ADDRESS = "localhost:8080"
 TESTDATA = "{{ config_root }}/data.json"
 GOTOOLCHAIN = "local"
-# keep rustup toolchains, cargo binaries and the crate registry inside the project
-CARGO_HOME = "{{ config_root }}/.cache/cargo"
-RUSTUP_HOME = "{{ config_root }}/.cache/rustup"
 
 [tools]
 # go
